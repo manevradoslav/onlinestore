@@ -1,39 +1,87 @@
-CREATE TABLE `product` (
-  `idproduct` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
-  `description` text,
-  `image` longblob,
-  `price` double NOT NULL,
-  PRIMARY KEY (`idproduct`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+-- Create table
+create table ACCOUNTS
+(
+  USER_NAME VARCHAR(20) not null,
+  ACTIVE    BIT not null,
+  ENCRYTED_PASSWORD  VARCHAR(128) not null,
+  USER_ROLE VARCHAR(20) not null
+) ;
 
-CREATE TABLE `users` (
-  `idusers` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
-  `email` varchar(45) NOT NULL,
-  `password` varchar(128) NOT NULL,
-  `role` varchar(45) NOT NULL,
-  PRIMARY KEY (`idusers`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+alter table ACCOUNTS
+  add primary key (USER_NAME) ;
+---------------------------------------
 
-CREATE TABLE `ordered_items` (
-  `idordered_items` int NOT NULL AUTO_INCREMENT,
-  `idproduct` int DEFAULT NULL,
-  `count` int DEFAULT '1',
-  PRIMARY KEY (`idordered_items`),
-  KEY `idproduct_idx` (`idproduct`),
-  CONSTRAINT `ordered_items_product_id_fk` FOREIGN KEY (`idproduct`) REFERENCES `product` (`idproduct`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+create table PRODUCTS
+(
+  CODE        VARCHAR(20) not null,
+  IMAGE       longblob,
+  NAME        VARCHAR(255) not null,
+  PRICE       double precision not null,
+  CREATE_DATE datetime not null
+) ;
 
-CREATE TABLE `order` (
-  `idorder` int NOT NULL AUTO_INCREMENT,
-  `idusers` int DEFAULT NULL,
-  `idordered_items` int DEFAULT NULL,
-  `order_date` datetime NOT NULL,
-  `ordernum` int NOT NULL,
-  PRIMARY KEY (`idorder`),
-  KEY `order_user_id_fk_idx` (`idusers`),
-  KEY `order_ordered_items_id_fk_idx` (`idordered_items`),
-  CONSTRAINT `order_ordered_items_id_fk` FOREIGN KEY (`idordered_items`) REFERENCES `ordered_items` (`idordered_items`),
-  CONSTRAINT `order_user_id_fk` FOREIGN KEY (`idusers`) REFERENCES `users` (`idusers`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+alter table PRODUCTS
+  add primary key (CODE) ;
+---------------------------------------
+-- Create table
+create table ORDERS
+(
+  ID               VARCHAR(50) not null,
+  AMOUNT           double precision not null,
+  CUSTOMER_ADDRESS VARCHAR(255) not null,
+  CUSTOMER_EMAIL   VARCHAR(128) not null,
+  CUSTOMER_NAME    VARCHAR(255) not null,
+  CUSTOMER_PHONE   VARCHAR(128) not null,
+  ORDER_DATE       datetime not null,
+  ORDER_NUM        INTEGER not null
+) ;
+alter table ORDERS
+  add primary key (ID) ;
+alter table ORDERS
+  add constraint ORDER_UK unique (ORDER_NUM) ;
+---------------------------------------
+
+-- Create table
+create table ORDER_DETAILS
+(
+  ID         VARCHAR(50) not null,
+  AMOUNT     double precision not null,
+  PRICE      double precision not null,
+  QUANITY    INTEGER not null,
+  ORDER_ID   VARCHAR(50) not null,
+  PRODUCT_ID VARCHAR(20) not null
+) ;
+--  
+alter table ORDER_DETAILS
+  add primary key (ID) ;
+alter table ORDER_DETAILS
+  add constraint ORDER_DETAIL_ORD_FK foreign key (ORDER_ID)
+  references ORDERS (ID);
+alter table ORDER_DETAILS
+  add constraint ORDER_DETAIL_PROD_FK foreign key (PRODUCT_ID)
+  references PRODUCTS (CODE);
+
+---------------------------------------  
+insert into Accounts (USER_NAME, ACTIVE, ENCRYTED_PASSWORD, USER_ROLE)
+values ('employee1', 1,
+'$2a$10$PrI5Gk9L.tSZiW9FXhTS8O8Mz9E97k2FZbFvGFFaSsiTUIl.TCrFu', 'ROLE_EMPLOYEE');
+
+insert into Accounts (USER_NAME, ACTIVE, ENCRYTED_PASSWORD, USER_ROLE)
+values ('manager1', 1,
+'$2a$10$PrI5Gk9L.tSZiW9FXhTS8O8Mz9E97k2FZbFvGFFaSsiTUIl.TCrFu', 'ROLE_MANAGER');
+
+----------------
+insert into products (CODE, NAME, PRICE, CREATE_DATE)
+values ('S001', 'Core Java', 100, sysdate);
+
+insert into products (CODE, NAME, PRICE, CREATE_DATE)
+values ('S002', 'Spring for Beginners', 50, sysdate);
+
+insert into products (CODE, NAME, PRICE, CREATE_DATE)
+values ('S003', 'Swift for Beginners', 120, sysdate);
+
+insert into products (CODE, NAME, PRICE, CREATE_DATE)
+values ('S004', 'Oracle XML Parser', 120, sysdate);
+
+insert into products (CODE, NAME, PRICE, CREATE_DATE)
+values ('S005', 'CSharp Tutorial for Beginers', 110, sysdate);
